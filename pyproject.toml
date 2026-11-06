@@ -1,0 +1,57 @@
+[build-system]
+# 1.27 is the first release that understands PEP 639 license metadata.
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "asm-mcp"
+dynamic = ["version"]
+description = "MCP server for the F6 ASM (Attack Surface Management) client API"
+readme = "README.md"
+authors = [{ name = "F6 JSC", email = "asm@f6.ru" }]
+requires-python = ">=3.10"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+keywords = ["mcp", "model-context-protocol", "attack-surface-management", "security"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Information Technology",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Security",
+]
+dependencies = [
+    "mcp==2.3.0",
+    # imported directly by server.py; unpinned because mcp pins it exactly itself
+    "mcp-types",
+    "httpx==0.28.1",
+    # tool argument models; a floor, the lock pins the version
+    "pydantic>=2.12",
+]
+
+[project.scripts]
+asm-mcp = "asm_mcp.server:cli"
+
+[dependency-groups]
+dev = ["ruff==0.16.6"]
+
+[tool.hatch.version]
+path = "src/asm_mcp/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/asm_mcp"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "S"]
+ignore = ["S101"]  # assert is fine in tests
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S105", "S106"]  # test fixtures carry obvious fake credentials

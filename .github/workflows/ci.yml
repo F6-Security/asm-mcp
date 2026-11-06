@@ -1,0 +1,76 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7.1.0
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      # Hash-pinned: the server holds a live ASM API token, so a substituted
+      # dependency is a credential compromise, not just a broken build.
+      - name: Install locked dependencies
+        run: pip install --require-hashes -r requirements.lock
+
+      - name: Install the package without touching the locked tree
+        run: pip install --no-deps -e .
+
+      - name: Run tests
+        run: python -m unittest discover -s tests -v
+
+      - name: Check the lock satisfies what the package declares
+        run: pip check
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7.1.0
+        with:
+          python-version: "3.12"
+
+      # --group needs pip 25.1 or newer.
+      - run: |
+          python -m pip install --upgrade pip
+          pip install --group dev
+
+      - run: ruff check .
+
+  lock:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2  # v10.3.3
+        with:
+          version: "0.12.10"
+
+      # Fails if pyproject.toml and requirements.lock have drifted apart. The lock
+      # is copied first because uv seeds the resolution from an existing output
+      # file: this asks "does the lock still match pyproject", not "is it the
+      # newest resolve".
+      - name: Verify the lock is current
+        run: |
+          mkdir -p /tmp/lockcheck
+          cp requirements.lock /tmp/lockcheck/requirements.lock
+          uv pip compile pyproject.toml --universal --python-version 3.10 \
+            --generate-hashes -o /tmp/lockcheck/requirements.lock --quiet
+          diff -u \
+            <(grep -v '^#    uv pip compile' requirements.lock) \
+            <(grep -v '^#    uv pip compile' /tmp/lockcheck/requirements.lock)

@@ -1,0 +1,13 @@
+.git
+.github
+.gitlab-ci.yml
+venv
+.venv
+__pycache__
+*.py[cod]
+.ruff_cache
+.env
+opencode.json
+tests
+Dockerfile
+.dockerignore
