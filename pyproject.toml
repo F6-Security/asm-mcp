@@ -35,6 +35,10 @@ dependencies = [
 [project.scripts]
 asm-mcp = "asm_mcp.server:cli"
 
+[project.urls]
+Homepage = "https://github.com/F6-Security/asm-mcp"
+Issues = "https://github.com/F6-Security/asm-mcp/issues"
+
 [dependency-groups]
 dev = ["ruff==0.16.6"]
 

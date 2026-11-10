@@ -1,6 +1,11 @@
 # F6 ASM MCP Server
 
-[Русский](README.md)
+[Русский](https://github.com/F6-Security/asm-mcp/blob/HEAD/README.md)
+
+[![PyPI](https://img.shields.io/pypi/v/asm-mcp)](https://pypi.org/project/asm-mcp/)
+[![Python](https://img.shields.io/pypi/pyversions/asm-mcp)](https://pypi.org/project/asm-mcp/)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue)](https://github.com/F6-Security/asm-mcp/blob/HEAD/LICENSE)
+[![CI](https://github.com/F6-Security/asm-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/F6-Security/asm-mcp/actions/workflows/ci.yml)
 
 An MCP server for the F6 ASM (Attack Surface Management) client API. It gives
 an AI assistant access to a company's external perimeter: its assets (domains,
@@ -25,14 +30,16 @@ updates, removes or changes a status before a request is sent.
 
 ## Quick start
 
-You need Python 3.10+, the address of your ASM installation and an API token.
+You need [uv](https://docs.astral.sh/uv/) (or Python 3.10+ and pip), the address of
+your ASM installation and an API token. `uvx asm-mcp` downloads the package from
+PyPI and runs it in an isolated environment; nothing has to be installed first.
 
 ```json
 {
   "mcpServers": {
     "asm": {
       "command": "uvx",
-      "args": ["--from", "/path/to/asm-mcp", "asm-mcp"],
+      "args": ["asm-mcp"],
       "env": {
         "ASM_BASE_URL": "https://asm.example.com",
         "ASM_API_TOKEN": "<token>"
@@ -51,8 +58,11 @@ For Claude Code:
 ```sh
 claude mcp add asm \
   -e ASM_BASE_URL=https://asm.example.com -e ASM_API_TOKEN=<token> \
-  -- uvx --from /path/to/asm-mcp asm-mcp
+  -- uvx asm-mcp
 ```
+
+Instead of `uvx` you can run `pip install asm-mcp` and point the client at the
+`asm-mcp` command.
 
 To install from source into a separate environment:
 
@@ -153,12 +163,12 @@ The token is sent only to the address in `ASM_BASE_URL` and only over
 `https://`. Redirects are not followed. An answer over 1 MB is not passed to
 the model.
 
-The threat model is described in [SECURITY.md](SECURITY.md).
+The threat model is described in [SECURITY.md](https://github.com/F6-Security/asm-mcp/blob/HEAD/SECURITY.md).
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md).
+See [CONTRIBUTING.md](https://github.com/F6-Security/asm-mcp/blob/HEAD/CONTRIBUTING.md).
 
 ## License
 
-[Apache License 2.0](LICENSE)
+[Apache License 2.0](https://github.com/F6-Security/asm-mcp/blob/HEAD/LICENSE)
